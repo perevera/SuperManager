@@ -42,4 +42,26 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/teamcolon" />
+    <TextView
+        android:id="@+id/percentcolon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=": "
+        android:layout_toRightOf="@id/percent" />    
+    <TextView
+        android:id="@+id/average"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/percentcolon" />
+    <TextView
+        android:id="@+id/averagecolon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=": "
+        android:layout_toRightOf="@id/average" />    
+    <TextView
+        android:id="@+id/price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/averagecolon" />
 </RelativeLayout>

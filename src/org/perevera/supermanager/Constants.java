@@ -14,5 +14,6 @@ public interface Constants extends BaseColumns {
     public static final String NAME = "name";
     public static final String TEAM = "team";
     public static final String PERCENTAGE = "percentage";
-    
+    public static final String AVERAGE = "average";
+    public static final String PRICE = "price";
 }

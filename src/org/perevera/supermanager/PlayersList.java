@@ -11,6 +11,7 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.SimpleCursorAdapter;
+import static org.perevera.supermanager.Constants.*;
 
 /**
  *
@@ -18,8 +19,8 @@ import android.widget.SimpleCursorAdapter;
  */
 public class PlayersList extends ListActivity {
 
-    private static final String[] FROM = {Constants._ID, Constants.NAME, Constants.TEAM, Constants.PERCENTAGE};
-    private static final int[] TO = {R.id.rowid, R.id.name, R.id.team, R.id.percent};
+    private static final String[] FROM = {_ID, NAME, TEAM, PERCENTAGE, AVERAGE, PRICE};
+    private static final int[] TO = {R.id.rowid, R.id.name, R.id.team, R.id.percent, R.id.average, R.id.price};
 //    private static String ORDER_BY = TIME + " DESC";
     private SupermanagerData players;
 

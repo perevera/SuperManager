@@ -5,11 +5,14 @@
  */
 package org.perevera.supermanager;
 
-import static android.provider.BaseColumns._ID;
-import static org.perevera.supermanager.Constants.TABLE_NAME;
-import static org.perevera.supermanager.Constants.NAME;
-import static org.perevera.supermanager.Constants.TEAM;
-import static org.perevera.supermanager.Constants.PERCENTAGE;
+//import static android.provider.BaseColumns._ID;
+import static org.perevera.supermanager.Constants.*;
+//import static org.perevera.supermanager.Constants.TABLE_NAME;
+//import static org.perevera.supermanager.Constants.NAME;
+//import static org.perevera.supermanager.Constants.TEAM;
+//import static org.perevera.supermanager.Constants.PERCENTAGE;
+//import static org.perevera.supermanager.Constants.AVERAGE;
+//import static org.perevera.supermanager.Constants.PRICE;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -21,7 +24,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class SupermanagerData extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "supermanager.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     /**
      * Create a helper object for the Events database
@@ -33,7 +36,7 @@ public class SupermanagerData extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " (" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + NAME + " TEXT NOT NULL," + TEAM + " TEXT NOT NULL,"
-                + PERCENTAGE + " REAL NOT NULL" + ");");
+                + PERCENTAGE + " REAL NOT NULL," + AVERAGE + " REAL NOT NULL," + PRICE + " INTEGER NOT NULL" + ");");
     }
 
     @Override

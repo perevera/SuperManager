@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,10 +19,10 @@ import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import static org.perevera.supermanager.Constants.NAME;
-import static org.perevera.supermanager.Constants.PERCENTAGE;
-import static org.perevera.supermanager.Constants.TABLE_NAME;
-import static org.perevera.supermanager.Constants.TEAM;
+import static org.perevera.supermanager.Constants.*;
+//import static org.perevera.supermanager.Constants.PERCENTAGE;
+//import static org.perevera.supermanager.Constants.TABLE_NAME;
+//import static org.perevera.supermanager.Constants.TEAM;
 
 /**
  *
@@ -174,11 +175,11 @@ public class PlayersGet extends Activity {
 
         // Ojo con los acentos, que no los entendemos con esta codificación, y también con los nombres compuestos (dos mayúsculas) y demás casos raros
 //        Pattern name = Pattern.compile(">([A-Z][a-zA-Z ]+, [A-Z][a-zA-Z]+)<");
-        Pattern name = Pattern.compile(">([\\w ]+, \\w+)<");
-        Pattern equipo = Pattern.compile(">([A-Z]+)<");
-        Pattern balance = Pattern.compile(">(\\d\\d*/\\d\\d*)<");
-//        Pattern promedio = Pattern.compile(">([\\w ]+, \\w+)<");
-//        Pattern precio = Pattern.compile(">([\\w ]+, \\w+)<");
+        
+        
+        
+        
+        
 //        Pattern minutos = Pattern.compile(">([\\w ]+, \\w+)<");        
 //        Pattern ultimaj = Pattern.compile(">([\\w ]+, \\w+)<");        
 //        Pattern ultimas3 = Pattern.compile(">([\\w ]+, \\w+)<");        
@@ -191,7 +192,7 @@ public class PlayersGet extends Activity {
         try {
 
             int i = 1;
-            String line, record, wins, losses;
+            String line;
             String[] splitRecord;
             Double pct;
             Matcher matcher;
@@ -214,31 +215,13 @@ public class PlayersGet extends Activity {
                     case 3:
 
                         // Se extrae el nombre completo del jugador
+                        Pattern name = Pattern.compile(">([\\w ]+, \\w+)<");
                         matcher = name.matcher(line);
 
                         if (matcher.find()) {
                             
                             String fullName = matcher.group(1);     // nombre completo
-                            
-//                            byte[] bytesOfMessage = fullName.getBytes("UTF-8");
-//                            MessageDigest md;
-//                            
-//                            try {
-//                                md = MessageDigest.getInstance("MD5");
-//                            }
-//                            catch (NoSuchAlgorithmException e) {
-//                                System.err.println("NoSuchAlgorithmException: " + e.getMessage());
-//                                return;
-//                            }
-//                                                        
-//                            byte[] thedigest = md.digest(bytesOfMessage);   // hash MD5 del nombre, son 16 bytes
-//                            ByteBuffer wrapped = ByteBuffer.wrap(thedigest); // big-endian by default
-//                            int id = wrapped.getInt();
-//                                                       
-//                            values.put(ID, id);
                             values.put(NAME, fullName);
-                            
-//                            System.out.println("ID del jugador: " + id);
                             System.out.println("Nombre del jugador: " + fullName);
                             
                         }
@@ -248,6 +231,7 @@ public class PlayersGet extends Activity {
                     case 5:
 
                         // Se extrae el nombre abreviado del equipo
+                        Pattern equipo = Pattern.compile(">([A-Z]+)<");
                         matcher = equipo.matcher(line);
 
                         if (matcher.find()) {
@@ -260,14 +244,15 @@ public class PlayersGet extends Activity {
                     case 6:
 
                         // Se extrae el balance de victorias/derrotas
+                        Pattern balance = Pattern.compile(">(\\d\\d*/\\d\\d*)<");
                         matcher = balance.matcher(line);
 
                         if (matcher.find()) {
+                            String record, wins, losses;
                             record = matcher.group(1);
                             splitRecord = record.split("/");
                             wins = splitRecord[0];
                             losses = splitRecord[1];
-//                            pct = Double.parseDouble(wins) / Double.parseDouble(losses);
                             pct = getPercentage(wins, losses);
                             values.put(PERCENTAGE, pct);
                             System.out.println("Balance de victorias/derrotas: " + matcher.group(1));
@@ -275,6 +260,42 @@ public class PlayersGet extends Activity {
                         }
 
                         break;
+                        
+                    case 7:
+
+                        // Se extrae el promedio de valoración
+                        Pattern promedio = Pattern.compile(">([0-9]+,[0-9]+)<");
+                        matcher = promedio.matcher(line);
+
+                        if (matcher.find()) {
+                            String average;
+                            average = matcher.group(1);
+                            // Remplazar la coma por punto para separar decimales, si no la conversión posterior no funciona
+                            average = average.replace(",", ".");
+                            Double avg = Double.parseDouble(average);                          
+                            values.put(AVERAGE, avg);
+                            System.out.println("Valoración promedio: " + avg);
+                        }
+
+                        break;
+                        
+                    case 8:
+
+                        // Se extrae el promedio de valoración
+                        Pattern precio = Pattern.compile(">([0-9]+.[0-9]+)<");
+                        matcher = precio.matcher(line);
+
+                        if (matcher.find()) {
+                            String price;
+                            price = matcher.group(1);
+                            // Eliminar el punto que separa los miles, si no la conversión posterior no funciona
+                            price = price.replace(".", "");
+                            Integer prc = Integer.parseInt(price);                          
+                            values.put(PRICE, prc);
+                            System.out.println("Precio: " + prc);
+                        }
+
+                        break;                        
 
                     case 15:
 
@@ -302,6 +323,14 @@ public class PlayersGet extends Activity {
 
             System.err.println("IOException: " + e.getMessage());
 
+        } catch (NumberFormatException e) {
+
+            System.err.println("NumberFormatException: " + e.getMessage());
+            
+        } catch (SQLiteException e) {
+
+            System.err.println("SQLiteException: " + e.getMessage());
+                        
         }
 
     }
