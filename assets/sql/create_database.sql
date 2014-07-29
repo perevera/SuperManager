@@ -12,6 +12,7 @@
 CREATE TABLE Players (
     _id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
+    position INTEGER NOT NULL,
     team TEXT NOT NULL,
     percentage REAL NOT NULL,
     average REAL NOT NULL,

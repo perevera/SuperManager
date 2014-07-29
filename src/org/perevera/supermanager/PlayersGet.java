@@ -31,6 +31,7 @@ import static org.perevera.supermanager.Constants.*;
 public class PlayersGet extends Activity {
 
     public static final String KEY_POSITION = "org.perevera.supermanager.position";
+    private int position;
     private SupermanagerData players;
     private SQLiteDatabase db;
 
@@ -40,7 +41,7 @@ public class PlayersGet extends Activity {
         super.onCreate(savedInstanceState);
 
         // Determina la posición en la cancha de los jugadores a listar
-        int pos = getIntent().getIntExtra(KEY_POSITION, 0);
+        position = getIntent().getIntExtra(KEY_POSITION, 0);
 
         // Selecciona el layout asociado a la actividad
         setContentView(R.layout.main);
@@ -58,7 +59,7 @@ public class PlayersGet extends Activity {
             System.out.println("Number of players deleted from the table: " + num); 
             
             // Carga el fichero HTML con la lista de jugadores de la posición indicada
-            loadList(pos);
+            loadList();
             //            Cursor cursor = getEvents();
             //            showEvents(cursor);
         } finally {
@@ -69,7 +70,7 @@ public class PlayersGet extends Activity {
         
     }
 
-    private void loadList(int pos) {
+    private void loadList() {
 
         try {
 
@@ -79,7 +80,7 @@ public class PlayersGet extends Activity {
             // Determina el nombre del fichero a cargar
             String filename = "";
 
-            switch (pos) {
+            switch (position) {
 
                 case 1:         // Bases
 
@@ -209,7 +210,7 @@ public class PlayersGet extends Activity {
                     case 1:
                     case 2:
 
-                        // La dos primeras líneas se saltan
+                        // Las dos primeras líneas se saltan
                         break;
 
                     case 3:
@@ -315,6 +316,9 @@ public class PlayersGet extends Activity {
                 i++;
 
             }
+            
+            // La columna posición se guarda aquí
+            values.put(POSITION, position);
 
             // Aquí se inserta en la DB la fila con los datos correspondientes a este jugador
             db.insertOrThrow(TABLE_NAME, null, values);
