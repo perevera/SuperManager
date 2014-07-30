@@ -19,10 +19,10 @@ import static org.perevera.supermanager.Constants.*;
  */
 public class PlayersList extends ListActivity {
 
-    private static final String[] FROM = {_ID, NAME, TEAM, PERCENTAGE, AVERAGE, PRICE};
+    private static final String[] FROM = {_ID, PLAYERS_NAME, PLAYERS_TEAM, PLAYERS_PERCENTAGE, PLAYERS_AVERAGE, PLAYERS_PRICE};
     private static final int[] TO = {R.id.rowid, R.id.name, R.id.team, R.id.percent, R.id.average, R.id.price};
 //    private static String ORDER_BY = TIME + " DESC";
-    private SupermanagerData players;
+    private DatabaseHelper players;
 
     /**
      * Called when the activity is first created.
@@ -36,7 +36,7 @@ public class PlayersList extends ListActivity {
         try {
 
             // Crea la instancia para acceder a la b.d.
-            players = new SupermanagerData(this);
+            players = new DatabaseHelper(this);
 
             // Crea el cursor para obtener los datos leídos
             Cursor cursor = getPlayers();
@@ -71,7 +71,7 @@ public class PlayersList extends ListActivity {
         // Perform a managed query. The Activity will handle closing
         // and re-querying the cursor when needed.
         SQLiteDatabase db = players.getReadableDatabase();
-        Cursor cursor = db.query(Constants.TABLE_NAME, FROM, null, null, null, null, null);
+        Cursor cursor = db.query(Constants.TABLE_PLAYERS, FROM, null, null, null, null, null);
         String sCursor = DatabaseUtils.dumpCursorToString(cursor);
         System.out.println("Cursor: " + sCursor);
         startManagingCursor(cursor);

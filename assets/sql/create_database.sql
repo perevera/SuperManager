@@ -26,28 +26,23 @@ CREATE TABLE Players (
 );
 
 CREATE TABLE Teams (
-     _id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    points REAL NOT NULL,
-    money INTEGER NOT NULL,
-    gameday INTEGER NOT NULL
+    _id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER NOT NULL,
+    name TEXT NOT NULL
+--     points REAL NOT NULL,
+--     money INTEGER NOT NULL,
+--     gameday INTEGER NOT NULL
 );
 
 CREATE TABLE Players2Teams (
     _id INTEGER PRIMARY KEY AUTOINCREMENT,
     url TEXT NOT NULL,
     player_name TEXT NOT NULL,
-    team_name TEXT NOT NULL,
+    team_id INTEGER NOT NULL,
     position INTEGER NOT NULL,
     costpurchase INTEGER NOT NULL,
-    FOREIGN KEY(player_name)
-        REFERENCES Players(name)
-            ON DELETE NO ACTION
-            ON UPDATE NO ACTION,
-    FOREIGN KEY(team_name)
-        REFERENCES Teams(name)
-            ON DELETE NO ACTION
-            ON UPDATE NO ACTION
+    FOREIGN KEY(player_name) REFERENCES Players(name) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    FOREIGN KEY(team_id) REFERENCES Teams(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 -- CREATE INDEX Player2Team_FKIndex1 ON Player2Team (Team_Id);

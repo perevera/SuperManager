@@ -22,7 +22,7 @@ import java.io.InputStream;
  *
  * @author perevera
  */
-public class SupermanagerData extends SQLiteOpenHelper {
+public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "supermanager.db";
     private static final int DATABASE_VERSION = 1;
@@ -31,7 +31,7 @@ public class SupermanagerData extends SQLiteOpenHelper {
     /**
      * Create a helper object for the Events database
      */
-    public SupermanagerData(Context ctx) {
+    public DatabaseHelper(Context ctx) {
         super(ctx, DATABASE_NAME, null, DATABASE_VERSION);
         myContext = ctx;
     }

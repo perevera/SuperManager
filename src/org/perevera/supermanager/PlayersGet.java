@@ -20,9 +20,9 @@ import java.text.DecimalFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import static org.perevera.supermanager.Constants.*;
-//import static org.perevera.supermanager.Constants.PERCENTAGE;
-//import static org.perevera.supermanager.Constants.TABLE_NAME;
-//import static org.perevera.supermanager.Constants.TEAM;
+//import static org.perevera.supermanager.Constants.PLAYERS_PERCENTAGE;
+//import static org.perevera.supermanager.Constants.TABLE_PLAYERS;
+//import static org.perevera.supermanager.Constants.PLAYERS_TEAM;
 
 /**
  *
@@ -32,7 +32,7 @@ public class PlayersGet extends Activity {
 
     public static final String KEY_POSITION = "org.perevera.supermanager.position";
     private int position;
-    private SupermanagerData players;
+    private DatabaseHelper players;
     private SQLiteDatabase db;
 
     @Override
@@ -43,18 +43,19 @@ public class PlayersGet extends Activity {
         // Determina la posición en la cancha de los jugadores a listar
         position = getIntent().getIntExtra(KEY_POSITION, 0);
 
+        // Esta actividad no tendrá layout asociado al final
         // Selecciona el layout asociado a la actividad
-        setContentView(R.layout.main);
+//        setContentView(R.layout.main);
 
         // Instancia el objeto que extiende SQLiteOpenHelper
-        players = new SupermanagerData(this);
+        players = new DatabaseHelper(this);
         
         // Obtiene acceso a la b.d.
         db = players.getWritableDatabase();
 
         try {
             // Borra la tabla de jugadores
-            int num = db.delete(TABLE_NAME, "1", null);
+            int num = db.delete(TABLE_PLAYERS, "1", null);
             
             System.out.println("Number of players deleted from the table: " + num); 
             
@@ -62,8 +63,15 @@ public class PlayersGet extends Activity {
             loadList();
             //            Cursor cursor = getEvents();
             //            showEvents(cursor);
+            
+        } catch (SQLiteException e) {
+
+            System.err.println("SQLiteException: " + e.getMessage());
+            
         } finally {
+            
             players.close();
+            
         }
         
         finish();
@@ -222,7 +230,7 @@ public class PlayersGet extends Activity {
                         if (matcher.find()) {
                             
                             String fullName = matcher.group(1);     // nombre completo
-                            values.put(NAME, fullName);
+                            values.put(PLAYERS_NAME, fullName);
                             System.out.println("Nombre del jugador: " + fullName);
                             
                         }
@@ -236,7 +244,7 @@ public class PlayersGet extends Activity {
                         matcher = equipo.matcher(line);
 
                         if (matcher.find()) {
-                            values.put(TEAM, matcher.group(1));
+                            values.put(PLAYERS_TEAM, matcher.group(1));
                             System.out.println("Iniciales del equipo: " + matcher.group(1));
                         }
 
@@ -255,7 +263,7 @@ public class PlayersGet extends Activity {
                             wins = splitRecord[0];
                             losses = splitRecord[1];
                             pct = getPercentage(wins, losses);
-                            values.put(PERCENTAGE, pct);
+                            values.put(PLAYERS_PERCENTAGE, pct);
                             System.out.println("Balance de victorias/derrotas: " + matcher.group(1));
                             System.out.println("Porcentaje de victorias: " + pct);
                         }
@@ -274,7 +282,7 @@ public class PlayersGet extends Activity {
                             // Remplazar la coma por punto para separar decimales, si no la conversión posterior no funciona
                             average = average.replace(",", ".");
                             Double avg = Double.parseDouble(average);                          
-                            values.put(AVERAGE, avg);
+                            values.put(PLAYERS_AVERAGE, avg);
                             System.out.println("Valoración promedio: " + avg);
                         }
 
@@ -292,7 +300,7 @@ public class PlayersGet extends Activity {
                             // Eliminar el punto que separa los miles, si no la conversión posterior no funciona
                             price = price.replace(".", "");
                             Integer prc = Integer.parseInt(price);                          
-                            values.put(PRICE, prc);
+                            values.put(PLAYERS_PRICE, prc);
                             System.out.println("Precio: " + prc);
                         }
 
@@ -304,7 +312,7 @@ public class PlayersGet extends Activity {
                         matcher = endrow.matcher(line);
 
                         if (matcher.matches()) {
-                            break player;      // si se llegó al final de la fila correspondiente a un jugador, salir del bucle para guardar los datos de la fila
+                            break player;      // si se llegó al final de la información correspondiente a un jugador, salir del bucle para guardar los datos de la fila
                         }
                         break;
 
@@ -318,10 +326,10 @@ public class PlayersGet extends Activity {
             }
             
             // La columna posición se guarda aquí
-            values.put(POSITION, position);
+            values.put(PLAYERS_POSITION, position);
 
             // Aquí se inserta en la DB la fila con los datos correspondientes a este jugador
-            db.insertOrThrow(TABLE_NAME, null, values);
+            db.insertOrThrow(TABLE_PLAYERS, null, values);
 
         } catch (IOException e) {
 
