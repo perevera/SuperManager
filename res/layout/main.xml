@@ -9,6 +9,13 @@
         android:layout_height="wrap_content"
         android:text="Hello World, SuperManager"
     />
+    <!--Barra de progreso de carga inicial de datos-->
+    <ProgressBar
+        android:id="@+id/progressBar_indicador"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dip" />
     <!-- Bases button -->
     <Button android:id="@+id/btnBases"
             android:layout_width="fill_parent"

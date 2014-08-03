@@ -5,12 +5,13 @@
  */
 package org.perevera.supermanager;
 
-import android.app.Activity;
+//import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.os.Bundle;
+import android.os.AsyncTask;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,27 +29,34 @@ import static org.perevera.supermanager.Constants.*;
  *
  * @author perevera
  */
-public class PlayersGet extends Activity {
+public class PlayersGet extends AsyncTask<Void, Void, Integer> {
 
     public static final String KEY_POSITION = "org.perevera.supermanager.position";
+    private Context ctx;
+    AssetManager assetManager;
     private int position;
     private DatabaseHelper players;
     private SQLiteDatabase db;
+    
+    //    El segundo parámetro, assetManager, desaparecerá cuando aquí se haga la carga del fichero vía HTTP
+    public PlayersGet(Context ctx, AssetManager assetManager, int position) {
+        
+        this.ctx = ctx;
+        this.assetManager = assetManager;
+        this.position = position;
+        
+    }
 
+//    @Override
+//    protected <any> doInBackground(Integer... params) {
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+//    }
+    
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-
-        super.onCreate(savedInstanceState);
-
-        // Determina la posición en la cancha de los jugadores a listar
-        position = getIntent().getIntExtra(KEY_POSITION, 0);
-
-        // Esta actividad no tendrá layout asociado al final
-        // Selecciona el layout asociado a la actividad
-//        setContentView(R.layout.main);
+    protected Integer doInBackground(Void... params) {
 
         // Instancia el objeto que extiende SQLiteOpenHelper
-        players = new DatabaseHelper(this);
+        players = new DatabaseHelper(ctx);
         
         // Obtiene acceso a la b.d.
         db = players.getWritableDatabase();
@@ -60,13 +68,14 @@ public class PlayersGet extends Activity {
             System.out.println("Number of players deleted from the table: " + num); 
             
             // Carga el fichero HTML con la lista de jugadores de la posición indicada
-            loadList();
+            return loadList();
             //            Cursor cursor = getEvents();
             //            showEvents(cursor);
             
         } catch (SQLiteException e) {
 
             System.err.println("SQLiteException: " + e.getMessage());
+            return -1;
             
         } finally {
             
@@ -74,17 +83,12 @@ public class PlayersGet extends Activity {
             
         }
         
-        finish();
-        
     }
 
-    private void loadList() {
+    protected int loadList() {
 
         try {
-
-            // Instancia el AssetManager para manejar recursos de tipo fichero
-            AssetManager assetManager = getAssets();
-
+          
             // Determina el nombre del fichero a cargar
             String filename = "";
 
@@ -111,18 +115,25 @@ public class PlayersGet extends Activity {
             // Abre el fichero HTML correspondiente
             InputStream input = assetManager.open("html/" + filename);
 
-            readHtmlFile(input);
+            return readHtmlFile(input);           
 
         } catch (IOException e) {
 
             System.err.println("IOException: " + e.getMessage());
+            return -1;
 
         }
 
     }
+    
+//    protected void onPostExecute(boolean result) {
+//         
+////         mImageView.setImageBitmap(result);
+//         
+//     }
 
     /* readHtmlFile: Lee el fichero HTML para encontrar las secciones donde hay información relevante de jugadores */
-    private void readHtmlFile(InputStream in) {
+    private int readHtmlFile(InputStream in) {
 
         int numPlayers = 0;
 
@@ -170,10 +181,13 @@ public class PlayersGet extends Activity {
             System.out.println("Number of players: " + numPlayers);   //Prints the number of players found
 
             reader.close();
+            
+            return numPlayers;
 
         } catch (IOException e) {
 
             System.err.println("IOException: " + e.getMessage());
+            return -1;
 
         }
 
@@ -183,12 +197,7 @@ public class PlayersGet extends Activity {
     private void extractPlayerData(BufferedReader reader) {
 
         // Ojo con los acentos, que no los entendemos con esta codificación, y también con los nombres compuestos (dos mayúsculas) y demás casos raros
-//        Pattern name = Pattern.compile(">([A-Z][a-zA-Z ]+, [A-Z][a-zA-Z]+)<");
-        
-        
-        
-        
-        
+//        Pattern name = Pattern.compile(">([A-Z][a-zA-Z ]+, [A-Z][a-zA-Z]+)<");   
 //        Pattern minutos = Pattern.compile(">([\\w ]+, \\w+)<");        
 //        Pattern ultimaj = Pattern.compile(">([\\w ]+, \\w+)<");        
 //        Pattern ultimas3 = Pattern.compile(">([\\w ]+, \\w+)<");        
