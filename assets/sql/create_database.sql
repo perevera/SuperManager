@@ -15,7 +15,7 @@ CREATE TABLE Players (
     position INTEGER NOT NULL,
     team TEXT NOT NULL,
     percentage REAL NOT NULL,
-    average REAL NOT NULL,
+    average REAL,
     price INTEGER NOT NULL
 --     minutes TEXT NOT NULL,
 --     lastval REAL NOT NULL,

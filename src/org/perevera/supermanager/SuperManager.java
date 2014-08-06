@@ -25,16 +25,12 @@ public class SuperManager extends Activity implements OnClickListener
         // La carga de datos se hará de otra manera, mediante threads asíncronos, pero de momento lo hacemos así:
         
         // Inicia el thread para carga de la tabla de bases en el mercado
-        PlayersGet asyncLoadBases = new PlayersGet(this, assetManager, 1);
+        PlayersGet asyncLoadBases = new PlayersGet(this, null, assetManager, 1);
         asyncLoadBases.execute();
-//        Intent b = new Intent(this, PlayersGet.class);
-//        b.putExtra(PlayersGet.KEY_POSITION, 1);
-//        startActivity(b);
         
         // Inicia el thread para carga de la lista de equipos de usuario
-        Intent t = new Intent(this, TeamsGet.class);
-//        b.putExtra(PlayersGet.KEY_POSITION, 1);
-        startActivity(t);
+        TeamsGet asyncLoadTeams = new TeamsGet(this, null, assetManager);
+        asyncLoadTeams.execute();
         
         // Set up click listeners for all the buttons
         View basesButton = findViewById(R.id.btnBases);

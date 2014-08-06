@@ -6,12 +6,10 @@
 
 package org.perevera.supermanager;
 
-import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.res.AssetManager;
-import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.os.Bundle;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,77 +23,62 @@ import static org.perevera.supermanager.Constants.*;
  *
  * @author perevera
  */
-public class TeamsGet extends Activity {
+public class TeamsGet extends GetInfo {
     
-    private DatabaseHelper teams;
-    private SQLiteDatabase db;
+    private final AssetManager assetManager;
+    private String filename;
     
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-
-        super.onCreate(savedInstanceState);
-
-        // Esta actividad no tendrá layout asociado al final
-        // Selecciona el layout asociado a la actividad
-//        setContentView(R.layout.main);
-
-        // Instancia el objeto que extiende SQLiteOpenHelper
-        teams = new DatabaseHelper(this);
+    /**
+        * Constructor
+        *
+        * @param ctx -> Objeto de tipo Context
+        * @param url -> URL de la página de donde cargar los datos (nula en la fase de tests)
+        * @param assetManager -> Objeto de tipo AssetManager (solo para la fase de tests)
+        * @param position -> Posición (bases, aleros o pivots)
+        */
+    public TeamsGet(Context ctx, String url, AssetManager assetManager) {
         
-        // Obtiene acceso a la b.d.
-        db = teams.getWritableDatabase();
-
-        try {
-            
-            // Por ahora, borra la tabla de equipos y jugadores por equipo
-            int num = db.delete(TABLE_TEAMS, "1", null);
-            db.delete(TABLE_PLAYERS2TEAMS, "1", null);
-            
-            System.out.println("Number of teams deleted from the table: " + num); 
-            
-            // Carga el fichero HTML con la lista de equipos
-            loadList();
-            
-        } catch (SQLiteException e) {
-
-            System.err.println("SQLiteException: " + e.getMessage());
-
-        } finally {
-            
-            teams.close();
-            
-        }
+        super(ctx, url);
         
-        finish();
+        this.assetManager = assetManager;
+        
+        filename =  "Ver_Equipos.html";
         
     }
+    
+    /**
+        * Carga la página HTML de un fichero guardado, solo para la fase de tests
+        *
+        *  @param url -> La URL de dónde cargar la página (Este parámetro me lo paso por el forro)
+        * 
+        * @return El objeto InputStream con el contenido de la página leída
+        */
+    @Override
+    protected InputStream downloadWebPage(String url) {              
 
-    /* loadList: Carga el fichero con la lista de equipos de este usuario */
-    private void loadList() {
-
+        InputStream content = null;
+        
         try {
-
-            // Instancia el AssetManager para manejar recursos de tipo fichero
-            AssetManager assetManager = getAssets();
-
-            // De momento vamos a piñón con un fichero HTML pre-cargado
-            String filename =  "Ver_Equipos.html";
-
-            // Abre el fichero HTML correspondiente
-            InputStream input = assetManager.open("html/" + filename);
-
-            readHtmlFile(input);
+            
+            content = assetManager.open("html/" + filename);
 
         } catch (IOException e) {
-
-            System.err.println("IOException: " + e.getMessage());
-
+            
+            System.err.println("SQLiteException: " + e.getMessage());
+            
         }
 
+        return content;
     }
 
-    /* readHtmlFile: Lee el fichero HTML para encontrar las secciones donde hay información relevante de equipos */
-    private void readHtmlFile(InputStream in) {
+    /**
+        * Lee el fichero HTML para encontrar las secciones donde hay información de equipos 
+        *
+        * @param in -> El objeto InputStream con el contenido de la página leída
+        * 
+        * @return Devuelve el nº de registros procesados
+        */
+    protected int processHtmlFile(InputStream in) {
 
         int numTeams = 0;
 
@@ -122,27 +105,34 @@ public class TeamsGet extends Activity {
                 if (m1.find()) {
 
                     numTeams++;
-                    extractTeamsData(reader);
+                    extractRecord(reader);
 
                 }
 
             }
 
             //            System.out.println(out.toString());   //Prints the string content read from input stream
-            System.out.println("Number of players: " + numTeams);   //Prints the number of players found
+            System.out.println("Number of players: " + numTeams);   //Prints the number of teams found
 
             reader.close();
+            
+            return numTeams;
 
         } catch (IOException e) {
 
             System.err.println("IOException: " + e.getMessage());
+            return -1;
 
         }
 
     }
 
-    /* extractPlayerData: Extrae información de los equipos definidos para este usuario */
-    private void extractTeamsData(BufferedReader reader) {
+    /**
+        * Extrae información de un equipo leyendo línea a línea y la guarda en un registro de la DB
+        *
+        * @param reader -> Objeto de tipo BufferedReader con las líneas leídas del fichero HTML
+         */    
+    protected void extractRecord(BufferedReader reader) {
 
         Pattern endrow = Pattern.compile("</tr>");
 
@@ -311,6 +301,27 @@ public class TeamsGet extends Activity {
                         
         }
 
+    }
+    
+    /**
+        * Borra las tablas de equipos y jugadores de equipos
+        *
+          */
+    protected void deleteTables() {
+
+        try {
+
+            // Por ahora, borra la tabla de equipos y jugadores por equipo
+            int num = db.delete(TABLE_TEAMS, "1", null);
+            db.delete(TABLE_PLAYERS2TEAMS, "1", null);
+            
+            System.out.println("Number of teams deleted from the table: " + num); 
+
+        } catch (SQLiteException e) {
+
+            System.err.println("SQLiteException: " + e.getMessage());
+
+        }
     }
     
 }

@@ -5,13 +5,10 @@
  */
 package org.perevera.supermanager;
 
-//import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.os.AsyncTask;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,119 +18,89 @@ import java.text.DecimalFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import static org.perevera.supermanager.Constants.*;
-//import static org.perevera.supermanager.Constants.PLAYERS_PERCENTAGE;
-//import static org.perevera.supermanager.Constants.TABLE_PLAYERS;
-//import static org.perevera.supermanager.Constants.PLAYERS_TEAM;
 
 /**
  *
  * @author perevera
  */
-public class PlayersGet extends AsyncTask<Void, Void, Integer> {
+public class PlayersGet extends GetInfo {
 
     public static final String KEY_POSITION = "org.perevera.supermanager.position";
-    private Context ctx;
-    AssetManager assetManager;
+    private final AssetManager assetManager;
+    private String filename;
     private int position;
-    private DatabaseHelper players;
-    private SQLiteDatabase db;
     
-    //    El segundo parámetro, assetManager, desaparecerá cuando aquí se haga la carga del fichero vía HTTP
-    public PlayersGet(Context ctx, AssetManager assetManager, int position) {
+    /**
+        * Constructor
+        *
+        * @param ctx -> Objeto de tipo Context
+        * @param url -> URL de la página de donde cargar los datos (nula en la fase de tests)
+        * @param assetManager -> Objeto de tipo AssetManager (solo para la fase de tests)
+        * @param position -> Posición (bases, aleros o pivots)
+        */
+    public PlayersGet(Context ctx, String url, AssetManager assetManager, Integer position) {
+
+        super(ctx, url);
         
-        this.ctx = ctx;
         this.assetManager = assetManager;
-        this.position = position;
-        
-    }
+       
+        switch (position) {
 
-//    @Override
-//    protected <any> doInBackground(Integer... params) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
-    
-    @Override
-    protected Integer doInBackground(Void... params) {
+            case 1:         // Bases
 
-        // Instancia el objeto que extiende SQLiteOpenHelper
-        players = new DatabaseHelper(ctx);
-        
-        // Obtiene acceso a la b.d.
-        db = players.getWritableDatabase();
+                filename = "Ver_Mercado_Bases.html";
+                //                    filename = "Ver_Mercado_Bases_trucated.html";        
+                break;
 
-        try {
-            // Borra la tabla de jugadores
-            int num = db.delete(TABLE_PLAYERS, "1", null);
-            
-            System.out.println("Number of players deleted from the table: " + num); 
-            
-            // Carga el fichero HTML con la lista de jugadores de la posición indicada
-            return loadList();
-            //            Cursor cursor = getEvents();
-            //            showEvents(cursor);
-            
-        } catch (SQLiteException e) {
+            case 2:         // Aleros
 
-            System.err.println("SQLiteException: " + e.getMessage());
-            return -1;
-            
-        } finally {
-            
-            players.close();
-            
+                filename = "Ver_Mercado_Aleros.html";
+                break;
+
+            case 3:         // Pivots
+
+                filename = "Ver_Mercado_Pivots.html";
+                break;
+
         }
-        
+
     }
+    
+    /**
+        * Carga la página HTML de un fichero guardado, solo para la fase de tests
+        *
+        *  @param url -> La URL de dónde cargar la página
+        * 
+        * @return El objeto InputStream con el contenido de la página leída
+        */
+    @Override
+    protected InputStream downloadWebPage(String url) {
+        
+        // El parámetro url me lo paso por el forro
 
-    protected int loadList() {
-
+        InputStream content = null;
+        
         try {
-          
-            // Determina el nombre del fichero a cargar
-            String filename = "";
-
-            switch (position) {
-
-                case 1:         // Bases
-
-                    filename = "Ver_Mercado_Bases.html";
-                    //                    filename = "Ver_Mercado_Bases_trucated.html";        
-                    break;
-
-                case 2:         // Aleros
-
-                    filename = "Ver_Mercado_Aleros.html";
-                    break;
-
-                case 3:         // Pivots
-
-                    filename = "Ver_Mercado_Pivots.html";
-                    break;
-
-            }
-
-            // Abre el fichero HTML correspondiente
-            InputStream input = assetManager.open("html/" + filename);
-
-            return readHtmlFile(input);           
+            
+            content = assetManager.open("html/" + filename);
 
         } catch (IOException e) {
-
-            System.err.println("IOException: " + e.getMessage());
-            return -1;
-
+            
+            System.err.println("SQLiteException: " + e.getMessage());
+            
         }
 
+        return content;
     }
-    
-//    protected void onPostExecute(boolean result) {
-//         
-////         mImageView.setImageBitmap(result);
-//         
-//     }
 
-    /* readHtmlFile: Lee el fichero HTML para encontrar las secciones donde hay información relevante de jugadores */
-    private int readHtmlFile(InputStream in) {
+    /**
+        * Lee el fichero HTML para encontrar las secciones donde hay información de jugadores 
+        *
+        * @param in -> El objeto InputStream con el contenido de la página leída
+        * 
+        * @return Devuelve el nº de registros procesados
+        */
+    protected int processHtmlFile(InputStream in) {
 
         int numPlayers = 0;
 
@@ -167,7 +134,7 @@ public class PlayersGet extends AsyncTask<Void, Void, Integer> {
                         if (m2.find()) {
 
                             numPlayers++;
-                            extractPlayerData(reader);
+                            extractRecord(reader);
 
                         }
 
@@ -193,8 +160,12 @@ public class PlayersGet extends AsyncTask<Void, Void, Integer> {
 
     }
 
-    /* extractPlayerData: Extrae información de un jugador leyendo línea a línea y la guarda en la DB */
-    private void extractPlayerData(BufferedReader reader) {
+    /**
+        * Extrae información de un jugador leyendo línea a línea y la guarda en un registro de la DB
+        *
+        * @param reader -> Objeto de tipo BufferedReader con las líneas leídas del fichero HTML
+         */    
+    protected void extractRecord(BufferedReader reader) {
 
         // Ojo con los acentos, que no los entendemos con esta codificación, y también con los nombres compuestos (dos mayúsculas) y demás casos raros
 //        Pattern name = Pattern.compile(">([A-Z][a-zA-Z ]+, [A-Z][a-zA-Z]+)<");   
@@ -299,7 +270,7 @@ public class PlayersGet extends AsyncTask<Void, Void, Integer> {
                         
                     case 8:
 
-                        // Se extrae el promedio de valoración
+                        // Se extrae el precio
                         Pattern precio = Pattern.compile(">([0-9]+.[0-9]+)<");
                         matcher = precio.matcher(line);
 
@@ -356,6 +327,26 @@ public class PlayersGet extends AsyncTask<Void, Void, Integer> {
 
     }
     
+    /**
+        * Borra la tabla de jugadores
+        *
+          */
+    protected void deleteTables() {
+
+        try {
+
+            // Borra la tabla de jugadores
+            int num = db.delete(TABLE_PLAYERS, "1", null);
+
+            System.out.println("Number of players deleted from the table: " + num);
+
+        } catch (SQLiteException e) {
+
+            System.err.println("SQLiteException: " + e.getMessage());
+
+        }
+    }
+
     /* getPercentage: Calcula el porcentaje de victorias a partir de los partidos ganados y perdidos */
     private Double getPercentage(String wins, String losses) {
         

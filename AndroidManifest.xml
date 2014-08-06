@@ -18,14 +18,6 @@
         <activity android:name=".Login"
                   android:label="Log in to Super Manager">
         </activity>
-        <!--Entry for PlayersGet.class--> 
-        <activity android:name=".PlayersGet"
-                  android:label="Get list of players">
-        </activity>
-        <!--Entry for TeamsGet.class--> 
-        <activity android:name=".TeamsGet"
-                  android:label="Get list of teams">
-        </activity>
         <!--Entry for .PlayersList.class--> 
         <activity android:name=".PlayersList"
                   android:label="Display list of players">
