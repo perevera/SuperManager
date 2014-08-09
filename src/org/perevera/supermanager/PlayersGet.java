@@ -32,6 +32,8 @@ public class PlayersGet extends GetInfo {
     
     /**
         * Constructor
+        * 
+        * Solo para fase de pruebas ya que elige a piñón fijo un fichero en lugar de cargar la página de la web
         *
         * @param ctx -> Objeto de tipo Context
         * @param url -> URL de la página de donde cargar los datos (nula en la fase de tests)

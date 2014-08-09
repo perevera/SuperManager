@@ -95,6 +95,13 @@ public abstract class GetInfo extends AsyncTask<Void, Void, Integer> {
 
     }
     
+    @Override
+    protected void onPostExecute(Integer result) {
+
+        Splash.finishedTasks++;
+        
+    }
+    
     /**
         * Borra las tablas implicadas antes de cargar los datos actuales 
         *

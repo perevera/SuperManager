@@ -7,11 +7,18 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application android:label="@string/app_name" android:icon="@drawable/ic_launcher">
-        <activity android:name=".SuperManager"
+        <activity android:name=".Splash"
                   android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>        
+        <activity android:name=".SuperManager"
+                  android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="org.perevera.supermanager.STARTINGPOING" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <!--  Entry for Login.class -->

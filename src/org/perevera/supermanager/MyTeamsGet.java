@@ -23,23 +23,27 @@ import static org.perevera.supermanager.Constants.*;
  *
  * @author perevera
  */
-public class TeamsGet extends GetInfo {
+public class MyTeamsGet extends GetInfo {
     
     private final AssetManager assetManager;
+    private Context ctx;
     private String filename;
     
     /**
         * Constructor
+        * 
+        * Solo para fase de pruebas ya que elige a piñón fijo un fichero en lugar de cargar la página de la web
         *
         * @param ctx -> Objeto de tipo Context
         * @param url -> URL de la página de donde cargar los datos (nula en la fase de tests)
         * @param assetManager -> Objeto de tipo AssetManager (solo para la fase de tests)
         * @param position -> Posición (bases, aleros o pivots)
         */
-    public TeamsGet(Context ctx, String url, AssetManager assetManager) {
+    public MyTeamsGet(Context ctx, String url, AssetManager assetManager) {
         
         super(ctx, url);
         
+        this.ctx = ctx;
         this.assetManager = assetManager;
         
         filename =  "Ver_Equipos.html";
@@ -286,6 +290,11 @@ public class TeamsGet extends GetInfo {
 
             // Aquí se inserta en la DB la fila con los datos correspondientes a este equipo
             db.insertOrThrow(TABLE_TEAMS, null, values);
+            
+            // Inicia el hilo para la carga de la lista de jugadores de este equipo
+            MyPlayersGet asyncLoadPlayers = new MyPlayersGet(ctx, null, assetManager);
+            asyncLoadPlayers.execute();
+
 
         } catch (IOException e) {
 
