@@ -32,6 +32,7 @@ import static org.perevera.supermanager.Constants.*;
 public class MyPlayersGet extends GetInfo {
     
     private final AssetManager assetManager;
+    private int position;
     private String filename;
     
     /**
@@ -49,7 +50,7 @@ public class MyPlayersGet extends GetInfo {
         
         this.assetManager = assetManager;
         
-        filename =  "Ver_Equipo_Melodramones";
+        filename =  "Ver_Equipo_Melodramones.html";
         
     }
     
@@ -110,6 +111,7 @@ public class MyPlayersGet extends GetInfo {
                 if (m1.find()) {
 
                     numTeams++;
+                    position++;
                     extractRecord(reader);
 
                 }
@@ -144,153 +146,73 @@ public class MyPlayersGet extends GetInfo {
         try {
 
             int i = 1;
-            String line = "";
+            String line;
             String[] splitRecord;
             Double pct;
             Matcher matcher;
-            // Insert a new record into the Players data source.
-            // You would do something similar for delete and update.
+            int numPlayers = 0;
+            
+            // Define los patrones para encontrar la información relevante
+            Pattern status = Pattern.compile("alt=\"Jugador (\\w)");
+            Pattern name = Pattern.compile(">([\\w ]+, \\w+)<");
             
             ContentValues values = new ContentValues();
-
+            
             players:
-            do {        // Aquí no hay que leer una nueva línea ya que la línea que viene ya contiene información relevante
+            while ((line = reader.readLine()) != null) {
 
-                switch (i) {            // En función del número de línea relativo a los datos de este equipo
+                matcher = status.matcher(line);
 
-                    case 1:
-                        
-                        // Se extrae el código del equipo
-//                        Pattern id = Pattern.compile("verequipo.php?id_equ=(\\d\\d\\d\\d\\d\\d)");
-                        Pattern id = Pattern.compile("id_equ=([0-9]+)\">([\\w ]+)<");
-                        matcher = id.matcher(line);
-                        
-                        if (matcher.find()) {
+                if (matcher.find()) {
 
-                            String sId = matcher.group(1);                  // ID del equipo
-                            Integer teamId = Integer.parseInt(sId);         // Se convierte a entero
-                            values.put(TEAMS_ID, teamId);
-                            System.out.println("ID del equipo: " + teamId);
+                    String tipoJugador = matcher.group(1);     // tipo de jugador
+//                    values.put(PLAYERS_NAME, fullName);
+                    System.out.println("Tipo de jugador: " + tipoJugador);
 
-//                        }
-//
-//                        // Se extrae el nombre del equipo
-//                        Pattern name = Pattern.compile(">([\\w ]+)<");
-//                        matcher = name.matcher(line);
-//
-//                        if (matcher.find()) {
-                            
-                            String teamName = matcher.group(2);     // nombre del equipo
-                            values.put(TEAMS_NAME, teamName);
-                            System.out.println("Nombre del equipo: " + teamName);
-                            
-                        }
+                } else {
 
-                        break;
+                    matcher = name.matcher(line);
 
-//                    case 5:
-//
-//                        // Se extrae el nombre abreviado del equipo
-//                        Pattern equipo = Pattern.compile(">([A-Z]+)<");
-//                        matcher = equipo.matcher(line);
-//
-//                        if (matcher.find()) {
-//                            values.put(PLAYERS_TEAM, matcher.group(1));
-//                            System.out.println("Iniciales del equipo: " + matcher.group(1));
-//                        }
-//
-//                        break;
-//
-//                    case 6:
-//
-//                        // Se extrae el balance de victorias/derrotas
-//                        Pattern balance = Pattern.compile(">(\\d\\d*/\\d\\d*)<");
-//                        matcher = balance.matcher(line);
-//
-//                        if (matcher.find()) {
-//                            String record, wins, losses;
-//                            record = matcher.group(1);
-//                            splitRecord = record.split("/");
-//                            wins = splitRecord[0];
-//                            losses = splitRecord[1];
-//                            pct = getPercentage(wins, losses);
-//                            values.put(PLAYERS_PERCENTAGE, pct);
-//                            System.out.println("Balance de victorias/derrotas: " + matcher.group(1));
-//                            System.out.println("Porcentaje de victorias: " + pct);
-//                        }
-//
-//                        break;
-//                        
-//                    case 7:
-//
-//                        // Se extrae el promedio de valoración
-//                        Pattern promedio = Pattern.compile(">([0-9]+,[0-9]+)<");
-//                        matcher = promedio.matcher(line);
-//
-//                        if (matcher.find()) {
-//                            String average;
-//                            average = matcher.group(1);
-//                            // Remplazar la coma por punto para separar decimales, si no la conversión posterior no funciona
-//                            average = average.replace(",", ".");
-//                            Double avg = Double.parseDouble(average);                          
-//                            values.put(PLAYERS_AVERAGE, avg);
-//                            System.out.println("Valoración promedio: " + avg);
-//                        }
-//
-//                        break;
-//                        
-//                    case 8:
-//
-//                        // Se extrae el promedio de valoración
-//                        Pattern precio = Pattern.compile(">([0-9]+.[0-9]+)<");
-//                        matcher = precio.matcher(line);
-//
-//                        if (matcher.find()) {
-//                            String price;
-//                            price = matcher.group(1);
-//                            // Eliminar el punto que separa los miles, si no la conversión posterior no funciona
-//                            price = price.replace(".", "");
-//                            Integer prc = Integer.parseInt(price);                          
-//                            values.put(PLAYERS_PRICE, prc);
-//                            System.out.println("Precio: " + prc);
-//                        }
-//
-//                        break;                        
-//
-//                    case 15:
-//
-//                        // Tras la última línea se abandona
-//                        matcher = endrow.matcher(line);
-//
-//                        if (matcher.matches()) {
-//                            break player;      // si se llegó al final de la fila correspondiente a un jugador, salir del bucle para guardar los datos de la fila
-//                        }
-//                        break;
-                        
-                    case 7:
+                    if (matcher.find()) {
 
-                        // Tras la última línea se abandona
-                        matcher = endrow.matcher(line);
+                        String fullName = matcher.group(1);     // nombre completo
+//                        values.put(PLAYERS_NAME, fullName);
+                        System.out.println("Nombre del jugador: " + fullName);
+                        numPlayers++;
 
-                        if (matcher.matches()) {
-                            break players;      // si se llegó al final de la información correspondiente a un equipo, salir del bucle para guardar los datos de la fila
-                        }
-                        break;
+                    }
 
-                    default:
-
-                    // De momento, no hacer nada, son los que faltan implementar...
                 }
 
-                i++;
+                switch (position) {
+                    
+                    case 1:     // Bases, habrá 3
+                        
+                        if (numPlayers == 3)    break players;
+                        break;
+                        
+                    case 2:     // Aleros, habrá 4
+                        
+                        if (numPlayers == 4)    break players;
+                        break;
+                        
+                    case 3:     // Pivots, habrá 4
+                        
+                        if (numPlayers == 4)    break players;
+                        break;
+                        
+                    default:
+                    
+                        break;
+                        
+                }
 
-            } while ((line = reader.readLine()) != null);
-            
+            }
+
             // La columna posición se guarda aquí
 //            values.put(PLAYERS_POSITION, position);
-
             // Aquí se inserta en la DB la fila con los datos correspondientes a este equipo
-            db.insertOrThrow(TABLE_TEAMS, null, values);
+//            db.insertOrThrow(TABLE_TEAMS, null, values);
 
         } catch (IOException e) {
 
@@ -299,11 +221,11 @@ public class MyPlayersGet extends GetInfo {
         } catch (NumberFormatException e) {
 
             System.err.println("NumberFormatException: " + e.getMessage());
-            
+
         } catch (SQLiteException e) {
 
             System.err.println("SQLiteException: " + e.getMessage());
-                        
+
         }
 
     }

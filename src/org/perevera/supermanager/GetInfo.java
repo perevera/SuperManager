@@ -46,6 +46,20 @@ public abstract class GetInfo extends AsyncTask<Void, Void, Integer> {
         this.url = url;
         
     }
+
+    /**
+        * Al inicio, suma 1 al contador global de tareas en marcha
+        */  
+    @Override
+    protected void onPreExecute() {
+        
+//        // Getting reference to the TextView tv_counter of the layout activity_main
+//        TextView tvCounter = (TextView) findViewById(R.id.tv_counter);
+//        tvCounter.setText("*START*");
+        
+       Splash.ongoingTasks++;
+       
+    }
     
     /**
         * Realiza las acciones en un hilo aparte: cargar página, leer línea a línea, extraer datos de registros y guardarlos
@@ -95,10 +109,13 @@ public abstract class GetInfo extends AsyncTask<Void, Void, Integer> {
 
     }
     
+    /**
+        * Al final, resta 1 al contador global de tareas en marcha
+        */      
     @Override
     protected void onPostExecute(Integer result) {
 
-        Splash.finishedTasks++;
+        Splash.ongoingTasks--;
         
     }
     

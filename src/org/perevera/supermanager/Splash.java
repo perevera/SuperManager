@@ -17,7 +17,7 @@ import android.os.Bundle;
  */
 public class Splash extends Activity {
     
-    static int finishedTasks;
+    static int ongoingTasks;
 
    /**
      * Aquí se muestra la pantalla de splash mientras se lanzan los procesos de carga de datos en paralelo
@@ -28,7 +28,7 @@ public class Splash extends Activity {
         super.onCreate(icicle);
         setContentView(R.layout.splash);
         
-        finishedTasks = 0;
+//        ongoingTasks = 0;
         
         Multithread multithread = new Multithread(this);
         multithread.start();
@@ -118,8 +118,11 @@ public class Splash extends Activity {
                 // Pausa de 5 segundos, aunque en realidad quiero que dure el tiempo que se tarda en cargar los datos
 //                sleep(5000);
                 
-                // Hasta que se completen las 2 tareas asíncronas esperadas
-                while (finishedTasks < 2) {}
+                // No dejamos la pantalla de splash mientras haya tareas en ejecución
+                do {
+                    System.out.println("Ongoing tasks: " + ongoingTasks);
+                    Thread.sleep(200);
+                } while (ongoingTasks > 0);
 
             } catch (Exception e) {
                 e.printStackTrace();
