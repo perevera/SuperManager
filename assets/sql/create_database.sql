@@ -11,13 +11,14 @@
 
 CREATE TABLE Players (
     _id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id TEXT NOT NULL,
     name TEXT NOT NULL,
     position INTEGER NOT NULL,
     team TEXT NOT NULL,
     percentage REAL NOT NULL,
     average REAL,
-    price INTEGER NOT NULL
---     minutes TEXT NOT NULL,
+    price INTEGER NOT NULL,
+    time TEXT NOT NULL
 --     lastval REAL NOT NULL,
 --     last3val REAL NOT NULL,
 --     up15 REAL NOT NULL,
@@ -36,12 +37,11 @@ CREATE TABLE Teams (
 
 CREATE TABLE Players2Teams (
     _id INTEGER PRIMARY KEY AUTOINCREMENT,
-    url TEXT NOT NULL,
-    player_name TEXT NOT NULL,
+    player_id TEXT NOT NULL,
     team_id INTEGER NOT NULL,
-    position INTEGER NOT NULL,
     costpurchase INTEGER NOT NULL,
-    FOREIGN KEY(player_name) REFERENCES Players(name) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    gameday INTEGER NOT NULL,
+    FOREIGN KEY(player_id) REFERENCES Players(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
     FOREIGN KEY(team_id) REFERENCES Teams(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 

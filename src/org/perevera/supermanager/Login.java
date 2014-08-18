@@ -5,91 +5,128 @@
  */
 package org.perevera.supermanager;
 
-import android.app.Activity;
-//import android.content.DialogInterface;
-//import android.content.DialogInterface.OnClickListener;
-import android.os.Bundle;
+import android.content.Context;
+import android.content.res.AssetManager;
+import android.os.AsyncTask;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.EditText;
-import java.io.IOException;
-//import org.jsoup.Connection.Method;
-//import org.jsoup.Connection.Response;
-//import org.jsoup.Jsoup;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 
 /**
  *
  * @author perevera
  */
-public class Login extends Activity implements OnClickListener {
+public class Login extends AsyncTask<Void, Void, Boolean> {
 
     private static final String TAG = "SuperManager";
-    private EditText usrEditText;
-    private EditText pwdEditText;
+    public static final String host = "supermanager.acb.com";
+    public static final String page = "/mundial/index.php";
     private String phpsessid;
     private String sesionligafantastica;
-    public static final String host = "supermanager.acb.com";
+
+//    /**
+//        * Constructor
+//        *
+//        * @param 
+//        */   
+//    public Login(Context ctx, String url) {
+//        
+//    }
+    
+    /**
+        * Al inicio, pone a nulas las cookies
+        */  
+    @Override
+    protected void onPreExecute() {
+
+        Splash.phpsessid = null;
+        Splash.sesionligafantastica = null;
+
+    }
 
     /**
-        * Called when the activity is first created.
+        * Realiza el envío de credenciales para la conexión en un hilo aparte
+        *
+        * @param Ninguno
+        * 
+        * @return True si el login tuvo éxito, False en caso contrario
         */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-
-        super.onCreate(savedInstanceState);
-
-        // Set View to login.xml
-        setContentView(R.layout.login);
-
-        // Set up click listener for login button
-        Button loginButton = (Button) findViewById(R.id.btnLogin);        
-        loginButton.setOnClickListener(this);
-        
-        // Get EditText objects
-        usrEditText = (EditText) findViewById(R.id.edit_user);
-        pwdEditText = (EditText) findViewById(R.id.edit_password);
-    }
-
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btnLogin:
-                logIn();
-                break;
-            // More buttons go here (if any) ...
-        }
-        
-        // Aquí terminamos esta actividad
-        finish();
-    }
-
-    /**
-        * Carga la página inicial enviando las credenciales
-        */
-    private void logIn() {
+    protected Boolean doInBackground(Void... params) {
 
         try {
 
-            /* Versión JSoup */
-//            Response response = Jsoup.connect("http://" + host)
-//                    .userAgent("Mozilla")
-//                    .cookie("auth", "token")
-////                    .data("query", "Java", "usuario", "Melodrame", "clave", "s1ns0nte", "control", "1")
-//                    .data("query", "Java", "usuario", usrEditText.getText().toString(), "clave", pwdEditText.getText().toString(), "control", "1")
-//                    .method(Method.POST)
-//                    .execute();
+            /* Versión Apache */
+            DefaultHttpClient client = new DefaultHttpClient();
+//			HttpClient client = new DefaultHttpClient();
 
-//            phpsessid = response.cookie("PHPSESSID");
-//            sesionligafantastica = response.cookie("sesionligafantastica");
+//		    CookieStore store = new BasicCookieStore();
+//		    store.addCookie(MyCookieStorageClass.getCookie());
+//		    client.setCookieStore(store);			
+            HttpPost post = new HttpPost("http://" + host + page);
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
+            nameValuePairs.add(new BasicNameValuePair("query", "Java"));
+            nameValuePairs.add(new BasicNameValuePair("usuario", "Melodrame"));
+            nameValuePairs.add(new BasicNameValuePair("clave", "s1ns0nte"));
+            nameValuePairs.add(new BasicNameValuePair("control", "1"));
+
+            post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            HttpResponse response = client.execute(post);
+
+            List<Cookie> cookies = client.getCookieStore().getCookies();
+
+            BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+
+            String line = "";
+            while ((line = rd.readLine()) != null) {
+                System.out.println(line);
+                if (line.startsWith("Auth=")) {
+                    String key = line.substring(5);
+                    // Do something with the key
+                }
+
+            }
+
+            phpsessid = cookies.get(0).toString();
+            sesionligafantastica = cookies.get(1).toString();
 
             Log.d(TAG, "PHPSESSID: " + phpsessid);
             Log.d(TAG, "sesionligafantastica: " + sesionligafantastica);
-//
+            
+            return Boolean.TRUE;
+
         } catch (Exception e) {
+            
             e.printStackTrace();
+            return Boolean.FALSE;
+            
         }
 
     }
 
+     /**
+        * Al final, guarda las cookies en variables del UI
+        */      
+    @Override
+    protected void onPostExecute(Boolean result) {
+
+        if (result) {
+            Splash.phpsessid = phpsessid;
+            Splash.sesionligafantastica = sesionligafantastica;
+            Splash.tries = 0;      // Esto es un indicador de que el login ha tenido éxito
+        } else {
+            Splash.tries++;
+        }
+    }
+    
 }
