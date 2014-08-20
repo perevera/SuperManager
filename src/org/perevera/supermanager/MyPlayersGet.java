@@ -15,6 +15,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteException;
+import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +31,7 @@ import static org.perevera.supermanager.Constants.*;
  */
 public class MyPlayersGet extends GetInfo {
 
+    private static final String TAG = "MyPlayersGet";
     private final AssetManager assetManager;
     private int position;
     private String filename;
@@ -91,7 +93,7 @@ public class MyPlayersGet extends GetInfo {
 
     /**
      * Lee el fichero HTML para encontrar las secciones donde hay información de
-     * equipos
+     * equipos/home/perevera/Desarrollo/android_projects/SuperManager/src/org/perevera/supermanager/MyPlayersGet.java:133
      *
      * @param in -> El objeto InputStream con el contenido de la página leída
      *
@@ -128,8 +130,8 @@ public class MyPlayersGet extends GetInfo {
 
             }
 
-            //            System.out.println(out.toString());   //Prints the string content read from input stream
-            System.out.println("Number of players: " + numPlayers);   //Prints the number of teams found
+            //            Log.d(TAG, out.toString());   //Prints the string content read from input stream
+            Log.d(TAG, "Number of players: " + numPlayers);   //Prints the number of teams found
 
             reader.close();
 
@@ -184,7 +186,7 @@ public class MyPlayersGet extends GetInfo {
 //
 //                            String tipoJugador = matcher.group(1);     // tipo de jugador
 //                            values.put(PLAYERS_NAME, fullName);
-//                            System.out.println("Tipo de jugador: " + tipoJugador);
+//                            Log.d(TAG, "Tipo de jugador: " + tipoJugador);
 //
 //                        }
 
@@ -200,8 +202,8 @@ public class MyPlayersGet extends GetInfo {
                             String playerId = matcher.group(1);     // ID de jugador
                             String fullName = matcher.group(2);     // nombre completo
                             values.put(PLAYERS_PLAYER_ID, playerId);
-                            System.out.println("ID de jugador: " + playerId);
-                            System.out.println("Nombre de jugador: " + fullName);
+                            Log.d(TAG, "ID de jugador: " + playerId);
+                            Log.d(TAG, "Nombre de jugador: " + fullName);
                             
                         }
 
@@ -215,7 +217,7 @@ public class MyPlayersGet extends GetInfo {
 
                             String teamShortName = matcher.group(1);     // Abreviatura de equipo ACB
                             values.put(PLAYERS_TEAM_ID, teamShortName);
-                            System.out.println("Abreviatura de equipo: " + teamShortName);
+                            Log.d(TAG, "Abreviatura de equipo: " + teamShortName);
                         }
 
                         break;
@@ -234,8 +236,8 @@ public class MyPlayersGet extends GetInfo {
                             Integer jornadaCompra = Integer.parseInt(jda);
                             values.put(PLAYERS_COST, precioCompra);
                             values.put(PLAYERS_DAY, jornadaCompra);
-                            System.out.println("Precio pagado: " + precioCompra);
-                            System.out.println("Jornada: " + jornadaCompra);
+                            Log.d(TAG, "Precio pagado: " + precioCompra);
+                            Log.d(TAG, "Jornada: " + jornadaCompra);
                             numPlayers++;
 
                         }

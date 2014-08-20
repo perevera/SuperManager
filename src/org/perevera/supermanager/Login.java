@@ -25,9 +25,9 @@ import org.apache.http.message.BasicNameValuePair;
  *
  * @author perevera
  */
-public class Login extends AsyncTask<Void, Void, Boolean> {
+public class Login extends AsyncTask<Void, Void, Integer>{
 
-    private static final String TAG = "SuperManager";
+    private static final String TAG = "Login";
     public static final String host = "supermanager.acb.com";
     public static final String page = "/mundial/index.php";
     private String phpsessid;
@@ -48,8 +48,8 @@ public class Login extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected void onPreExecute() {
 
-        Splash.phpsessid = null;
-        Splash.sesionligafantastica = null;
+        LoginActivity.phpsessid = null;
+        LoginActivity.sesionligafantastica = null;
 
     }
 
@@ -61,7 +61,7 @@ public class Login extends AsyncTask<Void, Void, Boolean> {
         * @return True si el login tuvo éxito, False en caso contrario
         */
     @Override
-    protected Boolean doInBackground(Void... params) {
+    protected Integer doInBackground(Void... params) {
 
         try {
 
@@ -89,7 +89,7 @@ public class Login extends AsyncTask<Void, Void, Boolean> {
 
             String line = "";
             while ((line = rd.readLine()) != null) {
-                System.out.println(line);
+                Log.d(TAG, line);
                 if (line.startsWith("Auth=")) {
                     String key = line.substring(5);
                     // Do something with the key
@@ -103,12 +103,12 @@ public class Login extends AsyncTask<Void, Void, Boolean> {
             Log.d(TAG, "PHPSESSID: " + phpsessid);
             Log.d(TAG, "sesionligafantastica: " + sesionligafantastica);
             
-            return Boolean.TRUE;
+            return 1;
 
         } catch (Exception e) {
             
             e.printStackTrace();
-            return Boolean.FALSE;
+            return 0;
             
         }
 
@@ -117,15 +117,14 @@ public class Login extends AsyncTask<Void, Void, Boolean> {
      /**
         * Al final, guarda las cookies en variables del UI
         */      
-    @Override
-    protected void onPostExecute(Boolean result) {
+    protected void onPostExecute(Integer result) {
 
-        if (result) {
-            Splash.phpsessid = phpsessid;
-            Splash.sesionligafantastica = sesionligafantastica;
-            Splash.tries = 0;      // Esto es un indicador de que el login ha tenido éxito
+        if (result == 1) {
+            LoginActivity.phpsessid = phpsessid;
+            LoginActivity.sesionligafantastica = sesionligafantastica;
+//            Splash.tries = 0;      // Esto es un indicador de que el login ha tenido éxito
         } else {
-            Splash.tries++;
+//            Splash.tries++;
         }
     }
     

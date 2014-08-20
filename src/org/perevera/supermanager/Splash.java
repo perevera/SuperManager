@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
+//import static org.perevera.supermanager.Constants.host;
+//import static org.perevera.supermanager.Constants.page;
 
 /**
  *
@@ -18,10 +20,7 @@ import android.util.Log;
  */
 public class Splash extends Activity {
     
-    private static final String TAG = "SuperManager";
-    static int tries;
-    static String phpsessid;
-    static String sesionligafantastica;
+    private static final String TAG = "Splash";
     static int ongoingTasks;
     
     /**
@@ -31,7 +30,7 @@ public class Splash extends Activity {
         */   
     public Splash() {
         
-        tries = 1;
+        // De momento, nada que hacer      
         
     }
 
@@ -43,12 +42,18 @@ public class Splash extends Activity {
 
         super.onCreate(icicle);
         setContentView(R.layout.splash);
-        
-        logIn();
-        
-        Multithread multithread = new Multithread(this);
-        multithread.start();
-                
+
+        try {
+
+            Multithread multithread = new Multithread(this);
+            multithread.start();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            finish();
+
+        }
     }
     
     @Override
@@ -56,33 +61,6 @@ public class Splash extends Activity {
         super.onPause();
         finish();
             
-    }
-    
-    private boolean logIn() {
-        try {
-
-            // Inicia el thread para login
-            Login login = new Login();
-            login.execute();
-
-            // No dejamos la pantalla de splash mientras haya tareas en ejecución
-            do {
-                Log.d(TAG, "Log in try #: " + tries);
-                Thread.sleep(200);
-                if (tries == 3) {
-                    return false;
-                }
-            } while (tries > 0);
-
-            return true;
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-            return false;
-
-        }
-
     }
     
     private class Multithread extends Thread {
@@ -114,8 +92,8 @@ public class Splash extends Activity {
                 
                 // No dejamos la pantalla de splash mientras haya tareas en ejecución
                 do {
-                    System.out.println("Ongoing tasks: " + ongoingTasks);
-                    Thread.sleep(200);
+                    Log.d(TAG, "Ongoing tasks: " + ongoingTasks);
+                    Thread.sleep(2000);
                 } while (ongoingTasks > 0);
 
             } catch (Exception e) {

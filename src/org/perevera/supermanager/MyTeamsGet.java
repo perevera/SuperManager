@@ -10,6 +10,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteException;
+import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +26,7 @@ import static org.perevera.supermanager.Constants.*;
  */
 public class MyTeamsGet extends GetInfo {
     
+    private static final String TAG = "MyTeamsGet";
     private final AssetManager assetManager;
     private Context ctx;
     private String filename;
@@ -115,8 +117,8 @@ public class MyTeamsGet extends GetInfo {
 
             }
 
-            //            System.out.println(out.toString());   //Prints the string content read from input stream
-            System.out.println("Number of players: " + numTeams);   //Prints the number of teams found
+            //            Log.d(TAG, out.toString());   //Prints the string content read from input stream
+            Log.d(TAG, "Number of players: " + numTeams);   //Prints the number of teams found
 
             reader.close();
             
@@ -169,7 +171,7 @@ public class MyTeamsGet extends GetInfo {
                             String sId = matcher.group(1);                  // ID del equipo
                             Integer teamId = Integer.parseInt(sId);         // Se convierte a entero
                             values.put(TEAMS_ID, teamId);
-                            System.out.println("ID del equipo: " + teamId);
+                            Log.d(TAG, "ID del equipo: " + teamId);
 
 //                        }
 //
@@ -181,7 +183,7 @@ public class MyTeamsGet extends GetInfo {
                             
                             String teamName = matcher.group(2);     // nombre del equipo
                             values.put(TEAMS_NAME, teamName);
-                            System.out.println("Nombre del equipo: " + teamName);
+                            Log.d(TAG, "Nombre del equipo: " + teamName);
                             
                         }
 
@@ -195,7 +197,7 @@ public class MyTeamsGet extends GetInfo {
 //
 //                        if (matcher.find()) {
 //                            values.put(PLAYERS_TEAM, matcher.group(1));
-//                            System.out.println("Iniciales del equipo: " + matcher.group(1));
+//                            Log.d(TAG, "Iniciales del equipo: " + matcher.group(1));
 //                        }
 //
 //                        break;
@@ -214,8 +216,8 @@ public class MyTeamsGet extends GetInfo {
 //                            losses = splitRecord[1];
 //                            pct = getPercentage(wins, losses);
 //                            values.put(PLAYERS_PERCENTAGE, pct);
-//                            System.out.println("Balance de victorias/derrotas: " + matcher.group(1));
-//                            System.out.println("Porcentaje de victorias: " + pct);
+//                            Log.d(TAG, "Balance de victorias/derrotas: " + matcher.group(1));
+//                            Log.d(TAG, "Porcentaje de victorias: " + pct);
 //                        }
 //
 //                        break;
@@ -233,7 +235,7 @@ public class MyTeamsGet extends GetInfo {
 //                            average = average.replace(",", ".");
 //                            Double avg = Double.parseDouble(average);                          
 //                            values.put(PLAYERS_AVERAGE, avg);
-//                            System.out.println("Valoración promedio: " + avg);
+//                            Log.d(TAG, "Valoración promedio: " + avg);
 //                        }
 //
 //                        break;
@@ -251,7 +253,7 @@ public class MyTeamsGet extends GetInfo {
 //                            price = price.replace(".", "");
 //                            Integer prc = Integer.parseInt(price);                          
 //                            values.put(PLAYERS_PRICE, prc);
-//                            System.out.println("Precio: " + prc);
+//                            Log.d(TAG, "Precio: " + prc);
 //                        }
 //
 //                        break;                        
@@ -324,7 +326,7 @@ public class MyTeamsGet extends GetInfo {
             int num = db.delete(TABLE_TEAMS, "1", null);
             db.delete(TABLE_PLAYERS2TEAMS, "1", null);
             
-            System.out.println("Number of teams deleted from the table: " + num); 
+            Log.d(TAG, "Number of teams deleted from the table: " + num); 
 
         } catch (SQLiteException e) {
 

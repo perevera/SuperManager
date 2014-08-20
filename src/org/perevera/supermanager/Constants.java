@@ -8,6 +8,10 @@ import android.provider.BaseColumns;
  */
 
 public interface Constants extends BaseColumns {
+    
+    // URLs
+    public static final String host = "supermanager.acb.com";
+    public static final String page = "/mundial/index.php";
 
     // Tabla de jugadores de mercado
     public static final String TABLE_PLAYERS = "Players";

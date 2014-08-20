@@ -9,6 +9,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteException;
+import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +26,7 @@ import static org.perevera.supermanager.Constants.*;
  */
 public class PlayersGet extends GetInfo {
 
+    private static final String TAG = "PlayersGet";
     public static final String KEY_POSITION = "org.perevera.supermanager.position";
     private final AssetManager assetManager;
     private String filename;
@@ -154,8 +156,8 @@ public class PlayersGet extends GetInfo {
 
             }
 
-            //            System.out.println(out.toString());   //Prints the string content read from input stream
-            System.out.println("Number of players: " + numPlayers);   //Prints the number of players found
+            //            Log.d(TAG, out.toString());   //Prints the string content read from input stream
+            Log.d(TAG, "Number of players: " + numPlayers);   //Prints the number of players found
 
             reader.close();
             
@@ -210,8 +212,8 @@ public class PlayersGet extends GetInfo {
                             playerId = matcher.group(1);        // ID de jugador
                             playerName = matcher.group(2);      // Nombre completo 
                             // Se usarán luego estos valores o en la cláusula WHERE del UPDATE o en las columnas del INSERT
-                            System.out.println("ID de jugador: " + playerId);
-                            System.out.println("Nombre de jugador: " + playerName);
+                            Log.d(TAG, "ID de jugador: " + playerId);
+                            Log.d(TAG, "Nombre de jugador: " + playerName);
 
                         }
 
@@ -223,7 +225,7 @@ public class PlayersGet extends GetInfo {
 
                         if (matcher.find()) {
                             values.put(PLAYERS_TEAM, matcher.group(1));
-                            System.out.println("Iniciales del equipo: " + matcher.group(1));
+                            Log.d(TAG, "Iniciales del equipo: " + matcher.group(1));
                         }
 
                         break;
@@ -240,8 +242,8 @@ public class PlayersGet extends GetInfo {
                             losses = splitRecord[1];
                             pct = getPercentage(wins, losses);
                             values.put(PLAYERS_PERCENTAGE, pct);
-                            System.out.println("Balance de victorias/derrotas: " + matcher.group(1));
-                            System.out.println("Porcentaje de victorias: " + pct);
+                            Log.d(TAG, "Balance de victorias/derrotas: " + matcher.group(1));
+                            Log.d(TAG, "Porcentaje de victorias: " + pct);
                         }
 
                         break;
@@ -256,7 +258,7 @@ public class PlayersGet extends GetInfo {
                             average = average.replace(",", ".");
                             Double avg = Double.parseDouble(average);                          
                             values.put(PLAYERS_AVERAGE, avg);
-                            System.out.println("Valoración promedio: " + avg);
+                            Log.d(TAG, "Valoración promedio: " + avg);
                         }
 
                         break;
@@ -271,7 +273,7 @@ public class PlayersGet extends GetInfo {
                             price = price.replace(".", "");
                             Integer prc = Integer.parseInt(price);                          
                             values.put(PLAYERS_PRICE, prc);
-                            System.out.println("Precio: " + prc);
+                            Log.d(TAG, "Precio: " + prc);
                         }
 
                         break;                        
@@ -285,7 +287,7 @@ public class PlayersGet extends GetInfo {
 //                            Integer secs = Integer.parseInt(matcher.group(2));      // se extraen los segundos y se convierten a entero
 //                            Integer totsecs = mins * 60 + secs;                     // se suma el total como segundos
                             values.put(PLAYERS_TIME, matcher.group(1));
-                            System.out.println("Minutos: " + matcher.group(1));
+                            Log.d(TAG, "Minutos: " + matcher.group(1));
                         }
 
                         break;
@@ -351,7 +353,7 @@ public class PlayersGet extends GetInfo {
 //            // Borra la tabla de jugadores
 //            int num = db.delete(TABLE_PLAYERS, "1", null);
 //
-//            System.out.println("Number of players deleted from the table: " + num);
+//            Log.d(TAG, "Number of players deleted from the table: " + num);
 //
 //        } catch (SQLiteException e) {
 //

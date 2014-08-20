@@ -10,6 +10,8 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+//import static android.provider.BaseColumns._ID;
+import android.util.Log;
 import android.widget.SimpleCursorAdapter;
 import static org.perevera.supermanager.Constants.*;
 
@@ -19,6 +21,7 @@ import static org.perevera.supermanager.Constants.*;
  */
 public class PlayersList extends ListActivity {
 
+    private static final String TAG = "PlayersList";
     private static final String[] FROM = {_ID, PLAYERS_NAME, PLAYERS_TEAM, PLAYERS_PERCENTAGE, PLAYERS_AVERAGE, PLAYERS_PRICE};
     private static final int[] TO = {R.id.rowid, R.id.name, R.id.team, R.id.percent, R.id.average, R.id.price};
 //    private static String ORDER_BY = TIME + " DESC";
@@ -73,7 +76,7 @@ public class PlayersList extends ListActivity {
         SQLiteDatabase db = players.getReadableDatabase();
         Cursor cursor = db.query(Constants.TABLE_PLAYERS, FROM, null, null, null, null, null);
         String sCursor = DatabaseUtils.dumpCursorToString(cursor);
-        System.out.println("Cursor: " + sCursor);
+        Log.d(TAG, "Cursor: " + sCursor);
         startManagingCursor(cursor);
         return cursor;
     }
